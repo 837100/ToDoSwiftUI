@@ -7,7 +7,8 @@ struct DetailView: View {
     @State var todo: String
     @State var todoDetails: String
     @State var endDate: Date
-    
+    @State var importance: Int = 0
+    let options = ["!", "!!", "!!!"]
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     init(item: Item) {
@@ -15,6 +16,7 @@ struct DetailView: View {
         _todo = State(initialValue: item.todo)
         _todoDetails = State(initialValue: item.todoDetails)
         _endDate = State(initialValue: item.endDate)
+        _importance = State(initialValue: item.importance)
     }
     
     var body: some View {
@@ -24,6 +26,7 @@ struct DetailView: View {
                           text: $todo
                 )
                 .border(.secondary)
+                .padding(.leading, 10)
                 
                 TextField("상세설명",
                           text: $todoDetails,
@@ -31,12 +34,29 @@ struct DetailView: View {
                 )
                 .lineLimit(1...20)
                 .border(.secondary)
+                .padding(.leading, 10)
                 
-                DatePicker(selection: $endDate) {
-                    Text("기한")
+                HStack {
+                    Image(systemName: "calendar")
+                        .padding(.leading)
+                    DatePicker("기한", selection: $endDate)
+                        .labelsHidden() // 텍스트 레이블 숨김
+                    
+                    Image(systemName: "flag")
+                    ForEach(0..<options.count, id: \.self) { index in
+                        Button(action: {
+                            importance = index
+                        }) {
+                            Text(options[index])
+                                .font(.headline)
+                                .frame(width: 40, height: 30)
+                                .background(importance == index ? importanceColor(for: index) : Color.white)
+                                .foregroundStyle(importance == index ? .white : .black) // 선택된 항목만 텍스트 색상 변경
+                                .cornerRadius(10)
+                                .shadow(color: .gray.opacity(0.5), radius: 5, x: 0, y: 5)
+                        }
+                    }
                 }
-                .border(.secondary)
-                Text("중요도: \(importToStrig(item.importance))")
                 
                 Button(action: {
                     updateItem()
@@ -71,7 +91,7 @@ struct DetailView: View {
             item.todo = todo
             item.todoDetails = todoDetails
             item.endDate = endDate
-            
+            item.importance = importance
             do {
                 try modelContext.save()
                 dismiss()
@@ -90,3 +110,5 @@ struct DetailView: View {
         }
     }
 }
+
+

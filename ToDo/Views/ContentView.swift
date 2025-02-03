@@ -124,16 +124,16 @@ struct ContentView: View {
                         /// 마감 시간이 촉박할 수록 위에 배치
                         Button("마감일 순") {
                             sortOrder = [
-                                SortDescriptor(\Item.importance, order: .reverse),
-                                SortDescriptor(\Item.endDate)
+                                SortDescriptor(\Item.endDate),
+                                SortDescriptor(\Item.importance, order: .reverse)
                             ]
                         }
                         
                         /// 중요도 먼저
                         Button("중요도 순") {
                             sortOrder = [
-                                SortDescriptor(\Item.endDate),
-                                SortDescriptor(\Item.importance, order: .reverse)
+                                SortDescriptor(\Item.importance, order: .reverse),
+                                SortDescriptor(\Item.endDate)
                             ]
                         }
                     } label: {
