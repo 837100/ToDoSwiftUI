@@ -8,7 +8,7 @@ struct ContentView: View {
     @State var endDate: Date = Date()
     @State var todoDetails: String = ""
     @State var importance: Int = 0
-    @State var showingPopup = false
+
     
     let options = ["!", "!!", "!!!"]
     @Environment(\.modelContext) private var modelContext
@@ -115,9 +115,22 @@ struct ContentView: View {
                             .shadow(color: .gray.opacity(0.5), radius : 5, x : 0, y : 5)
                     })
                     
-                    Button(action: {
-                       
-                    }, label: {
+                    Menu {
+                        /// 기본
+                        Button("생성일 순") {
+                            // 필터 1 적용
+                        }
+                        
+                        /// 마감 시간이 촉박할 수록 위에 배치
+                        Button("마감일 순") {
+                            // 필터 2 적용
+                        }
+                        
+                        /// 중요도 먼저
+                        Button("중요도 순") {
+                            // 필터 초기화
+                        }
+                    } label: {
                         Image(systemName: "line.3.horizontal.decrease")
                             .font(.headline)
                             .foregroundStyle(.white)
@@ -128,10 +141,15 @@ struct ContentView: View {
                             .background(Color.blue)
                             .cornerRadius(10)
                             .shadow(color: .gray.opacity(0.5), radius : 5, x : 0, y : 5)
-                            .sheet(isPresented: $showingPopup) {
-                                   // TODO: 필터 설정 창 구현 필요
-                            }
-                    })
+                            .contextMenu {
+                                   Button("옵션 1") {
+                                       // 동작
+                                   }
+                                   Button("옵션 2") {
+                                       // 동작
+                                   }
+                               }
+                    }
                 } // end of HStack
                 List {
                     ForEach(items) { item in
@@ -186,7 +204,7 @@ struct ContentView: View {
     private func dateFormatString(date: Date?) -> String {
         guard let date = date else { return "날짜 없음"}
         let formatter = DateFormatter()
-        formatter.dateFormat = "~ MM/dd HH:mm"
+        formatter.dateFormat = "MM/dd HH:mm 까지"
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter.string(from: date)
     }

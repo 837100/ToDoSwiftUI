@@ -18,13 +18,15 @@ struct SearchView: View {
         self.todoDetails = todoDetails
         
         _foundItems = Query(filter: #Predicate<Item> { item in
-            if todo != "" {
-                return item.endDate <= endDate && item.importance == importance && item.todo.localizedStandardContains(todo)
-            } else if todoDetails != "" {
-                return item.endDate <= endDate && item.importance == importance && item.todoDetails.localizedStandardContains(todoDetails)
-            } else {
-                item.endDate <= endDate && item.importance == importance
-            }
+            item.endDate <= endDate &&
+            item.importance == importance &&
+            (
+                (!todo.isEmpty && item.todo.localizedStandardContains(todo)) ||
+                (!todoDetails.isEmpty && item.todoDetails.localizedStandardContains(todoDetails)) ||
+                (todo.isEmpty && todoDetails.isEmpty)
+            )
+  
+            
         })
     }
     
