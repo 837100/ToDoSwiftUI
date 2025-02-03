@@ -80,13 +80,9 @@ struct ContentView: View {
                                 .shadow(color: .gray.opacity(0.5), radius: 5, x: 0, y: 5)
                         }
                     }
-                    
-                    
-                    
                 }
                 
                 HStack {
-                    
                     NavigationLink  {
                         SearchView(
                             todo: todo,
@@ -119,7 +115,6 @@ struct ContentView: View {
                             .cornerRadius(10)
                             .shadow(color: .gray.opacity(0.5), radius : 5, x : 0, y : 5)
                     })
-                    
                     Menu {
                         /// 기본
                         Button("생성일 순") {
@@ -128,12 +123,10 @@ struct ContentView: View {
                         
                         /// 마감 시간이 촉박할 수록 위에 배치
                         Button("마감일 순") {
-                            
                             sortOrder = [
                                 SortDescriptor(\Item.importance, order: .reverse),
                                 SortDescriptor(\Item.endDate)
                             ]
-                            
                         }
                         
                         /// 중요도 먼저
@@ -155,22 +148,26 @@ struct ContentView: View {
                             .shadow(color: .gray.opacity(0.5), radius : 5, x : 0, y : 5)
                     }
                 } // end of HStack
+                
+                
+                /// 할일이 나타나는 List
                 List {
                     ForEach(sortedItems) { item in
                         NavigationLink {
                             DetailView(item: item)
                         } label: {
                             HStack {
-                                Toggle("", isOn: Binding(
-                                    get: {item.isToggled},
-                                    set: { newValue in
-                                        withAnimation {
-                                            item.isToggled = newValue
-                                        }
+                                Image(systemName: item.isToggled ?
+                                      "checkmark.square.fill" : "square")
+                                .onTapGesture {
+                                    withAnimation {
+                                        item.isToggled.toggle()
                                     }
-                                ))
-                                .labelsHidden()
+                                }
                                 Text(item.todo)
+                                Spacer()
+                                Text(options[item.importance])
+                                    .foregroundStyle(importanceColor(for: item.importance))
                                 Spacer()
                                 Text(dateFormatString(date: item.endDate))
                                 //                                Text("\(item.todoId)")
@@ -208,7 +205,7 @@ struct ContentView: View {
     private func dateFormatString(date: Date?) -> String {
         guard let date = date else { return "날짜 없음"}
         let formatter = DateFormatter()
-        formatter.dateFormat = "MM/dd HH:mm 까지"
+        formatter.dateFormat = "~ MM/dd HH:mm"
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter.string(from: date)
     }
