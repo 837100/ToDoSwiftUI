@@ -8,13 +8,19 @@ struct ContentView: View {
     @State var endDate: Date = Date()
     @State var todoDetails: String = ""
     @State var importance: Int = 0
-
-    
     let options = ["!", "!!", "!!!"]
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @State private var sortOrder: [SortDescriptor<Item>] = [SortDescriptor(\Item.createdAt)]
+    @Query(sort: [SortDescriptor(\Item.createdAt)]) private var items: [Item]
+    
+    
+    
+    var sortedItems: [Item] {
+        items.sorted(using: sortOrder)
+    }
     
     var body: some View {
+        
         NavigationStack {
             VStack {
                 Spacer()
@@ -80,6 +86,7 @@ struct ContentView: View {
                 }
                 
                 HStack {
+                    
                     NavigationLink  {
                         SearchView(
                             todo: todo,
@@ -91,7 +98,6 @@ struct ContentView: View {
                                 .font(.headline)
                                 .foregroundStyle(.white)
                                 .font(.headline)
-                                .foregroundStyle(.white)
                                 .padding()
                                 .frame(width: 80, height: 40)
                                 .background(Color.blue)
@@ -107,7 +113,6 @@ struct ContentView: View {
                             .font(.headline)
                             .foregroundStyle(.white)
                             .font(.headline)
-                            .foregroundStyle(.white)
                             .padding()
                             .frame(width: 80, height: 40)
                             .background(Color.blue)
@@ -118,41 +123,40 @@ struct ContentView: View {
                     Menu {
                         /// 기본
                         Button("생성일 순") {
-                            // 필터 1 적용
+                            sortOrder = [SortDescriptor(\Item.createdAt)]
                         }
                         
                         /// 마감 시간이 촉박할 수록 위에 배치
                         Button("마감일 순") {
-                            // 필터 2 적용
+                            
+                            sortOrder = [
+                                SortDescriptor(\Item.importance, order: .reverse),
+                                SortDescriptor(\Item.endDate)
+                            ]
+                            
                         }
                         
                         /// 중요도 먼저
                         Button("중요도 순") {
-                            // 필터 초기화
+                            sortOrder = [
+                                SortDescriptor(\Item.endDate),
+                                SortDescriptor(\Item.importance, order: .reverse)
+                            ]
                         }
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease")
                             .font(.headline)
                             .foregroundStyle(.white)
                             .font(.headline)
-                            .foregroundStyle(.white)
                             .padding()
                             .frame(width: 80, height: 40)
                             .background(Color.blue)
                             .cornerRadius(10)
                             .shadow(color: .gray.opacity(0.5), radius : 5, x : 0, y : 5)
-                            .contextMenu {
-                                   Button("옵션 1") {
-                                       // 동작
-                                   }
-                                   Button("옵션 2") {
-                                       // 동작
-                                   }
-                               }
                     }
                 } // end of HStack
                 List {
-                    ForEach(items) { item in
+                    ForEach(sortedItems) { item in
                         NavigationLink {
                             DetailView(item: item)
                         } label: {
@@ -169,7 +173,7 @@ struct ContentView: View {
                                 Text(item.todo)
                                 Spacer()
                                 Text(dateFormatString(date: item.endDate))
-//                                Text("\(item.todoId)")
+                                //                                Text("\(item.todoId)")
                             }
                             .foregroundStyle(item.isToggled ? .gray : .black)
                             .strikethrough(item.isToggled, color: .gray)
@@ -196,7 +200,7 @@ struct ContentView: View {
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(items[index])
+                modelContext.delete(sortedItems[index])
             }
         }
     } // end of deleteItems
