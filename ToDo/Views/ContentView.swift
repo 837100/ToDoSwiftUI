@@ -60,9 +60,9 @@ struct ContentView: View {
                         }
                     }
                     ForEach(sortedItems) { item in
-                        NavigationLink {
-                            DetailView(item: item)
-                        } label: {
+                        NavigationLink(destination:
+                            TodoAddView(item: item)
+                        ) {
                             HStack {
                                 Image(systemName: item.isToggled ?
                                       "checkmark.square.fill" : "square")
@@ -88,7 +88,7 @@ struct ContentView: View {
         } // end of NavigationStack
         .toolbar {
                    ToolbarItem(placement: .navigationBarTrailing) {
-                       NavigationLink(destination: TodoAddView()) {
+                       NavigationLink(destination: TodoAddView(item: Item(todo: "", endDate: Date(), todoId: UUID(), todoDetails: "", importance: 0, createdAt: Date()))) {
                            Image(systemName: "square.and.pencil")
                        }
                    }
@@ -133,6 +133,6 @@ struct ContentView: View {
 #Preview {
     NavigationStack {
         ContentView()
-            .modelContainer(for: Item.self, inMemory: true)
     }
+    .modelContainer(PreviewContainer.shared.container)
 }

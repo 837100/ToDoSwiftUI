@@ -12,23 +12,27 @@ struct TodoAddView: View {
     @State var todo: String = ""
     @State var endDate: Date = Date()
     @State var todoDetails: String = ""
-    @State var importance: Int = 0
+    @State var importance: Int
     let options = ["!", "!!", "!!!"]
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @State private var sortOrder: [SortDescriptor<Item>] = [SortDescriptor(\Item.createdAt)]
-    @Query(sort: [SortDescriptor(\Item.createdAt)]) private var items: [Item]
+    let item: Item
+    let isEditing : Bool
     
-    var sortedItems: [Item] {
-        items.sorted(using: sortOrder)
+    init (item: Item) {
+        self.item = item
+        self.isEditing = !item.todo.isEmpty
+        
+        _todo = State(initialValue: item.todo)
+        _todoDetails = State(initialValue: item.todoDetails)
+        _endDate = State(initialValue: item.endDate)
+        _importance = State(initialValue: item.importance)
     }
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 20) {
-                // Input Card
                 VStack(spacing: 16) {
-                    // Todo Input
                     HStack {
                         Image(systemName: "pencil")
                             .foregroundStyle(.blue)
@@ -43,7 +47,6 @@ struct TodoAddView: View {
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(12)
                     
-                    // Details Input
                     HStack {
                         Image(systemName: "text.alignleft")
                             .foregroundStyle(.blue)
@@ -58,12 +61,8 @@ struct TodoAddView: View {
                     .background(Color.gray.opacity(0.1))
                     .cornerRadius(12)
                     
-                    // Date and Importance
                     VStack(spacing: 12) {
-                        // Custom Date Picker
                         DateSelectionView(selectedDate: $endDate)
-                        
-                        // Importance Buttons
                         HStack {
                             Image(systemName: "flag")
                                 .foregroundStyle(.blue)
@@ -91,14 +90,15 @@ struct TodoAddView: View {
                 .shadow(color: .gray.opacity(0.1), radius: 10)
                 .padding(.horizontal)
                 
-                
                 Button(action: {
-                    addItem()
-//                    todo = ""
-//                    todoDetails = ""
+                    if isEditing {
+                        updateItem()
+                    } else {
+                        addItem()
+                    }
                     dismiss()
                 }) {
-                    Label("추가", systemImage: "plus")
+                    Label(isEditing ? "수정" : "추가", systemImage: "plus")
                         .font(.headline)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
@@ -106,30 +106,29 @@ struct TodoAddView: View {
                         .foregroundStyle(.white)
                         .cornerRadius(25)
                 }
-                
-                
-                
-                
                 Spacer()
             }
             .navigationTitle("할 일 추가")
-            .animation(.spring(response: 0.3), value: items)
         }
     }
     
-    // Helper functions remain the same
+    private func updateItem() {
+        withAnimation {
+            item.todo = todo
+            item.todoDetails = todoDetails
+            item.endDate = endDate
+            item.importance = importance
+        }
+    }
+    
     private func addItem() {
         withAnimation {
-            let newItem = Item(todo: todo, endDate: endDate, todoId: UUID(), todoDetails: todoDetails, importance: importance)
+            let newItem = Item(todo: todo,
+                               endDate: endDate,
+                               todoId: UUID(),
+                               todoDetails: todoDetails,
+                               importance: importance)
             modelContext.insert(newItem)
-        }
-    }
-    
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(sortedItems[index])
-            }
         }
     }
     
@@ -152,6 +151,11 @@ struct TodoAddView: View {
 }
 
 #Preview {
-    TodoAddView()
-        .modelContainer(for: Item.self, inMemory: true)
+    TodoAddView(item: Item(todo: "할일",
+                           endDate: Date(),
+                           todoId: UUID(),
+                           todoDetails: "상세",
+                           importance: 1,
+                           createdAt: Date()))
+        .modelContainer(PreviewContainer.shared.container)
 }
