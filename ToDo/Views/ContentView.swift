@@ -7,7 +7,9 @@ struct ContentView: View {
     @State var endDate: Date = Date()
     @State var todoDetails: String = ""
     @State var importance: Int = 0
+    @State private var alertShowing = false
     let options = ["!", "!!", "!!!"]
+    @State private var deleteIndex : IndexSet?
     @State private var searchText = ""
     @Environment(\.modelContext) private var modelContext
     @State private var sortOrder: [SortDescriptor<Item>] = [SortDescriptor(\Item.createdAt)]
@@ -84,8 +86,21 @@ struct ContentView: View {
                             .strikethrough(item.isToggled, color: .gray)
                         }
                     }
-                    .onDelete(perform: deleteItems)
+                    
+                    .onDelete { indexSet in
+                        deleteIndex = indexSet
+                        alertShowing = true
+                    }
+                    
                 } // end of List
+                .alert("삭제하시겠습니까?", isPresented: $alertShowing) {
+                    Button("취소", role: .cancel) {}
+                    Button("삭제", role: .destructive) {
+                        if let index = deleteIndex {
+                            deleteItems(offsets: index)
+                        }
+                    }
+                }
             } // end of VStack
         } // end of NavigationStack
         .toolbar {
