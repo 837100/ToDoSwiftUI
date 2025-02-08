@@ -112,3 +112,6 @@ struct DetailView: View {
 }
 
 
+#Preview {
+    DetailView(item: Item(todo: "할일", endDate: Date(), todoId: UUID(), todoDetails: "디테일", importance: 1, createdAt: Date()))
+}
