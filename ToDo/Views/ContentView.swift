@@ -108,15 +108,16 @@ struct ContentView: View {
                     }
                 }
             } // end of VStack
-        } // end of NavigationStack
-        .toolbar {
-                   ToolbarItem(placement: .navigationBarTrailing) {
-                       NavigationLink(destination: TodoAddView(item: Item(todo: "", endDate: Date(), todoId: UUID(), todoDetails: "", importance: 0, createdAt: Date()))) {
-                           Image(systemName: "square.and.pencil")
+            .toolbar {
+                       ToolbarItem(placement: .navigationBarTrailing) {
+                           NavigationLink(destination: TodoAddView(item: Item(todo: "", endDate: Date(), todoId: UUID(), todoDetails: "", importance: 0, createdAt: Date()))) {
+                               Image(systemName: "square.and.pencil")
+                           }
                        }
                    }
-               }
-        .navigationTitle("할 일 목록")
+            .navigationTitle("할 일 목록")
+        } // end of NavigationStack
+       
     } // end of body view
     
 
@@ -146,8 +147,6 @@ struct ContentView: View {
 } // end of ContentView
 
 #Preview {
-    NavigationStack {
         ContentView()
-    }
     .modelContainer(PreviewContainer.shared.container)
 }
