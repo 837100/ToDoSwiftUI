@@ -73,10 +73,12 @@ struct ContentView: View {
                                 }
                                 Text(item.todo)
                                 Spacer()
+                                Text(dateFormatString(date: item.endDate))
+                                    .foregroundStyle(.gray)
+                                    .frame(width: 146, alignment: .trailing)
                                 Text(options[item.importance])
                                     .foregroundStyle(importanceColor(for: item.importance))
-                                Spacer()
-                                Text(dateFormatString(date: item.endDate))
+                                    .frame(width: 15, alignment: .leading)
                             }
                             .foregroundStyle(item.isToggled ? .gray : .black)
                             .strikethrough(item.isToggled, color: .gray)
@@ -114,7 +116,7 @@ struct ContentView: View {
     private func dateFormatString(date: Date?) -> String {
         guard let date = date else { return "날짜 없음"}
         let formatter = DateFormatter()
-        formatter.dateFormat = "~ MM/dd HH:mm"
+        formatter.dateFormat = "yyyy. M. d. HH:mm"
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter.string(from: date)
     }

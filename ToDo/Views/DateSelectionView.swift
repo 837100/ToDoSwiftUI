@@ -13,7 +13,7 @@ struct DateSelectionView: View {
     
     private let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.dateFormat = "M월 d일 HH:mm 까지"
+        formatter.dateFormat = "yyyy년 MM월 dd일 HH시mm분"
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter
     }()

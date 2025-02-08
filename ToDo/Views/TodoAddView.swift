@@ -131,15 +131,7 @@ struct TodoAddView: View {
             modelContext.insert(newItem)
         }
     }
-    
-    private func dateFormatString(date: Date?) -> String {
-        guard let date = date else { return "날짜 없음" }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "M월 d일 HH:mm"
-        formatter.locale = Locale(identifier: "ko_KR")
-        return formatter.string(from: date)
-    }
-    
+
     private func importanceColor(for index: Int) -> Color {
         switch index {
         case 0: return .green
