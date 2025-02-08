@@ -9,7 +9,7 @@ struct ContentView: View {
     @State var importance: Int = 0
     @State private var alertShowing = false
     let options = ["!", "!!", "!!!"]
-    @State private var deleteIndex : IndexSet?
+    @State private var deleteItem : Item?
     @State private var searchText = ""
     @Environment(\.modelContext) private var modelContext
     @State private var sortOrder: [SortDescriptor<Item>] = [SortDescriptor(\Item.createdAt)]
@@ -85,19 +85,25 @@ struct ContentView: View {
                             .foregroundStyle(item.isToggled ? .gray : .black)
                             .strikethrough(item.isToggled, color: .gray)
                         }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                deleteItem = item
+                                alertShowing = true
+                            } label: {
+                                Label("삭제", systemImage: "trash")
+                            }
+                            .tint(.red)
+                        }
                     }
                     
-                    .onDelete { indexSet in
-                        deleteIndex = indexSet
-                        alertShowing = true
-                    }
+                  
                     
                 } // end of List
                 .alert("삭제하시겠습니까?", isPresented: $alertShowing) {
                     Button("취소", role: .cancel) {}
                     Button("삭제", role: .destructive) {
-                        if let index = deleteIndex {
-                            deleteItems(offsets: index)
+                        if let item = deleteItem {
+                            deleteItems(item: item)
                         }
                     }
                 }
@@ -113,18 +119,10 @@ struct ContentView: View {
         .navigationTitle("할 일 목록")
     } // end of body view
     
-    private func addItem() {
+
+    private func deleteItems(item: Item) {
         withAnimation {
-            let newItem = Item(todo: todo, endDate: endDate, todoId: UUID(), todoDetails: todoDetails, importance: importance)
-            modelContext.insert(newItem)
-        }
-    } // end of addItem
-    
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(sortedItems[index])
-            }
+                modelContext.delete(item)
         }
     } // end of deleteItems
     
